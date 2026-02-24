@@ -1,17 +1,15 @@
 package com.wellsfargo.counselor.entity;
 
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Advisor {
 
     @Id
-    @GeneratedValue()
-    private long advisorId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long advisorId;
 
     @Column(nullable = false)
     private String firstName;
@@ -28,8 +26,10 @@ public class Advisor {
     @Column(nullable = false)
     private String email;
 
-    protected Advisor() {
+    @OneToMany(mappedBy = "advisor", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Customer> customers = new ArrayList<>();
 
+    protected Advisor() {
     }
 
     public Advisor(String firstName, String lastName, String address, String phone, String email) {
@@ -82,5 +82,24 @@ public class Advisor {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public List<Customer> getCustomers() {
+        return customers;
+    }
+
+    public void setCustomers(List<Customer> customers) {
+        this.customers = customers;
+    }
+
+    // Helper methods (best practice)
+    public void addCustomer(Customer customer) {
+        customers.add(customer);
+        customer.setAdvisor(this);
+    }
+
+    public void removeCustomer(Customer customer) {
+        customers.remove(customer);
+        customer.setAdvisor(null);
     }
 }
